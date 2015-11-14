@@ -1,6 +1,6 @@
 {
   "name": "tap-diff",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Simple TAP reporter shows diffs of failed tests.",
   "main": "./distributions/index.js",
   "bin": {
