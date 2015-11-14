@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "Simple TAP reporter shows diffs of failed tests.",
   "main": "./distributions/index.js",
+  "bin": {
+    "tap-diff": "./distributions/cli.js"
+  },
   "scripts": {
     "babel": "babel ./sources --out-dir ./distributions",
     "test": "echo \"Error: no test specified\" && exit 1"
