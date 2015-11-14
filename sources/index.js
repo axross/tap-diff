@@ -1,4 +1,3 @@
-import _ from 'babel/polyfill';
 import { diffWords, diffJson } from 'diff';
 import chalk from 'chalk';
 import duplexer from 'duplexer';
@@ -81,20 +80,20 @@ const createReporter = () => {
 
   };
 
-  const handleComplete = results => {
+  const handleComplete = result => {
     const finishedAt = Date.now();
 
     write('\n');
-    write(chalk.green(`passed: ${results.pass}  `));
-    write(chalk.red(`failed: ${results.fail || 0}  `));
-    write(chalk.white(`of ${results.count} tests  `));
+    write(chalk.green(`passed: ${result.pass}  `));
+    write(chalk.red(`failed: ${result.fail || 0}  `));
+    write(chalk.white(`of ${result.count} tests  `));
     write(chalk.dim(`(${prettyMs(finishedAt - startedAt)})\n\n`));
 
-    if (results.ok) {
-      write(chalk.green(`All of ${results.count} tests passed!`));
+    if (result.ok) {
+      write(chalk.green(`All of ${result.count} tests passed!`));
     } else {
       write(chalk.red(
-        `${results.fail} of ${results.count} tests failed.`
+        `${result.fail} of ${result.count} tests failed.`
       ));
       stream.isFailed = true;
     }
