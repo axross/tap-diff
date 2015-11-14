@@ -1,6 +1,6 @@
 # tap-diff
 
-[![npm version](https://badge.fury.io/js/ffetch.svg)](http://badge.fury.io/js/ffetch)
+[![npm version](https://badge.fury.io/js/tap-diff.svg)](http://badge.fury.io/js/tap-diff)
 
 Simple TAP reporter shows diffs of failed tests.
 
