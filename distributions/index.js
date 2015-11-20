@@ -91,6 +91,8 @@ var createReporter = function createReporter() {
       var compared = (0, _diff.diffJson)(diag.actual, diag.expected).map(writeDiff).join('');
 
       println(compared, 4);
+    } else if (diag.expected === 'undefined' && diag.actual === 'undefined') {
+      ;
     } else if (typeof diag.expected === 'string') {
       var compared = (0, _diff.diffWords)(diag.actual, diag.expected).map(writeDiff).join('');
 
@@ -110,7 +112,7 @@ var createReporter = function createReporter() {
     if (result.ok) {
       println(_chalk2['default'].green('All of ' + result.count + ' tests passed!'));
     } else {
-      println(_chalk2['default'].red(result.fail + ' of ' + result.count + ' tests failed.'));
+      println(_chalk2['default'].red((result.fail || 0) + ' of ' + result.count + ' tests failed.'));
       stream.isFailed = true;
     }
 
