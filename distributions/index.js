@@ -6,10 +6,6 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _babelPolyfill = require('babel/polyfill');
-
-var _babelPolyfill2 = _interopRequireDefault(_babelPolyfill);
-
 var _diff = require('diff');
 
 var _chalk = require('chalk');
@@ -46,7 +42,8 @@ var createReporter = function createReporter() {
   var stream = (0, _duplexer2['default'])(p, output);
   var startedAt = Date.now();
 
-  var write = function write(str) {
+  var println = function println() {
+    var input = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
     var indentLevel = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
 
     var indent = '';
@@ -55,20 +52,21 @@ var createReporter = function createReporter() {
       indent += INDENT;
     }
 
-    output.push(str.split('\n').map(function (part) {
-      return part.length > 0 ? '' + indent + part : part;
-    }).join('\n'));
+    input.split('\n').forEach(function (line) {
+      output.push('' + indent + line);
+      output.push('\n');
+    });
   };
 
   var handleTest = function handleTest(name) {
-    write('\n');
-    write(_chalk2['default'].blue(name) + '\n', 1);
+    println();
+    println(_chalk2['default'].blue(name), 1);
   };
 
   var handleAssertSuccess = function handleAssertSuccess(assert) {
     var name = assert.name;
 
-    write(_chalk2['default'].green(FIG_TICK) + '  ' + _chalk2['default'].dim(name) + '\n', 2);
+    println(_chalk2['default'].green(FIG_TICK) + '  ' + _chalk2['default'].dim(name), 2);
   };
 
   var handleAssertFailure = function handleAssertFailure(assert) {
@@ -84,44 +82,39 @@ var createReporter = function createReporter() {
       if (added) style = _chalk2['default'].green.inverse;
       if (removed) style = _chalk2['default'].red.inverse;
 
-      return value.split('\n').map(function (str) {
-        return str.length > 0 ? style(str) : str;
-      }).join('\n');
+      return style(value);
     };
 
-    write(_chalk2['default'].red(FIG_CROSS) + '  ' + _chalk2['default'].red(name) + ' ', 2);
-    write('at ' + _chalk2['default'].magenta(diag.at) + '\n');
+    println(_chalk2['default'].red(FIG_CROSS) + '  ' + _chalk2['default'].red(name) + ' at ' + _chalk2['default'].magenta(diag.at), 2);
 
     if (typeof diag.expected === 'object' && diag.expected !== null) {
       var compared = (0, _diff.diffJson)(diag.actual, diag.expected).map(writeDiff).join('');
 
-      write(compared + '\n', 4);
+      println(compared, 4);
     } else if (typeof diag.expected === 'string') {
       var compared = (0, _diff.diffWords)(diag.actual, diag.expected).map(writeDiff).join('');
 
-      write(compared + '\n', 4);
+      println(compared, 4);
     } else {
-      write('        ' + _chalk2['default'].red.inverse(diag.actual) + _chalk2['default'].green.inverse(diag.expected) + '\n');
+      println(_chalk2['default'].red.inverse(diag.actual) + _chalk2['default'].green.inverse(diag.expected), 4);
     }
   };
 
-  var handleComplete = function handleComplete(results) {
+  var handleComplete = function handleComplete(result) {
     var finishedAt = Date.now();
 
-    write('\n');
-    write(_chalk2['default'].green('passed: ' + results.pass + '  '));
-    write(_chalk2['default'].red('failed: ' + (results.fail || 0) + '  '));
-    write(_chalk2['default'].white('of ' + results.count + ' tests  '));
-    write(_chalk2['default'].dim('(' + (0, _prettyMs2['default'])(finishedAt - startedAt) + ')\n\n'));
+    println();
+    println(_chalk2['default'].green('passed: ' + result.pass + '  ') + _chalk2['default'].red('failed: ' + (result.fail || 0) + '  ') + _chalk2['default'].white('of ' + result.count + ' tests  ') + _chalk2['default'].dim('(' + (0, _prettyMs2['default'])(finishedAt - startedAt) + ')'));
+    println();
 
-    if (results.ok) {
-      write(_chalk2['default'].green('All of ' + results.count + ' tests passed!'));
+    if (result.ok) {
+      println(_chalk2['default'].green('All of ' + result.count + ' tests passed!'));
     } else {
-      write(_chalk2['default'].red(results.fail + ' of ' + results.count + ' tests failed.'));
+      println(_chalk2['default'].red(result.fail + ' of ' + result.count + ' tests failed.'));
       stream.isFailed = true;
     }
 
-    write('\n\n');
+    println();
   };
 
   p.on('comment', function (comment) {
@@ -145,6 +138,10 @@ var createReporter = function createReporter() {
 
   p.on('child', function (child) {
     ;
+  });
+
+  p.on('extra', function (extra) {
+    println(_chalk2['default'].yellow(('' + extra).replace(/\n$/, '')), 4);
   });
 
   return stream;

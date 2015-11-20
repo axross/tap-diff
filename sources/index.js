@@ -11,34 +11,33 @@ const FIG_TICK = figures.tick;
 const FIG_CROSS = figures.cross;
 
 const createReporter = () => {
-  const output = through2()
+  const output = through2();
   const p = parser();
   const stream = duplexer(p, output);
   const startedAt = Date.now();
 
-  const write = (str, indentLevel = 0) => {
+  const println = (input = '', indentLevel = 0) => {
     let indent = '';
 
     for (let i = 0; i < indentLevel; ++i) {
       indent += INDENT;
     }
 
-    output.push(
-      str.split('\n')
-        .map(part => part.length > 0 ? `${indent}${part}` : part)
-        .join('\n')
-    );
+    input.split('\n').forEach(line => {
+      output.push(`${indent}${line}`);
+      output.push('\n');
+    });
   };
 
   const handleTest = name => {
-    write('\n');
-    write(`${chalk.blue(name)}\n`, 1);
+    println();
+    println(chalk.blue(name), 1);
   };
 
   const handleAssertSuccess = assert => {
     const name = assert.name;
 
-    write(`${chalk.green(FIG_TICK)}  ${chalk.dim(name)}\n`, 2);
+    println(`${chalk.green(FIG_TICK)}  ${chalk.dim(name)}`, 2)
   };
 
   const handleAssertFailure = assert => {
@@ -50,55 +49,51 @@ const createReporter = () => {
       if (added)   style = chalk.green.inverse;
       if (removed) style = chalk.red.inverse;
 
-      return value.split('\n')
-        .map(str => str.length > 0 ? style(str) : str)
-        .join('\n')
+      return style(value);
     };
 
-    write(`${chalk.red(FIG_CROSS)}  ${chalk.red(name)} `, 2);
-    write(`at ${chalk.magenta(diag.at)}\n`);
+    println(`${chalk.red(FIG_CROSS)}  ${chalk.red(name)} at ${chalk.magenta(diag.at)}`, 2);
 
     if (typeof diag.expected === 'object' && diag.expected !== null) {
       const compared = diffJson(diag.actual, diag.expected)
         .map(writeDiff)
         .join('');
 
-      write(`${compared}\n`, 4);
+      println(compared, 4);
     } else if (typeof diag.expected === 'string') {
       const compared = diffWords(diag.actual, diag.expected)
         .map(writeDiff)
         .join('');
 
-      write(`${compared}\n`, 4);
+      println(compared, 4);
     } else {
-      write('        ' +
-        chalk.red.inverse(diag.actual) +
-        chalk.green.inverse(diag.expected) + '\n'
+      println(
+        chalk.red.inverse(diag.actual) + chalk.green.inverse(diag.expected),
+        4
       );
     }
-
-
   };
 
   const handleComplete = result => {
     const finishedAt = Date.now();
 
-    write('\n');
-    write(chalk.green(`passed: ${result.pass}  `));
-    write(chalk.red(`failed: ${result.fail || 0}  `));
-    write(chalk.white(`of ${result.count} tests  `));
-    write(chalk.dim(`(${prettyMs(finishedAt - startedAt)})\n\n`));
+    println();
+    println(
+      chalk.green(`passed: ${result.pass}  `) +
+      chalk.red(`failed: ${result.fail || 0}  `) +
+      chalk.white(`of ${result.count} tests  `) +
+      chalk.dim(`(${prettyMs(finishedAt - startedAt)})`)
+    );
+    println();
 
     if (result.ok) {
-      write(chalk.green(`All of ${result.count} tests passed!`));
+      println(chalk.green(`All of ${result.count} tests passed!`));
     } else {
-      write(chalk.red(
-        `${result.fail} of ${result.count} tests failed.`
-      ));
+      println(chalk.red(`${result.fail} of ${result.count} tests failed.`));
       stream.isFailed = true;
     }
 
-    write('\n\n');
+    println();
   };
 
   p.on('comment', (comment) => {
@@ -122,6 +117,10 @@ const createReporter = () => {
 
   p.on('child', (child) => {
     ;
+  });
+
+  p.on('extra', extra => {
+    println(chalk.yellow(`${extra}`.replace(/\n$/, '')), 4);
   });
 
   return stream;
