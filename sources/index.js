@@ -60,6 +60,8 @@ const createReporter = () => {
         .join('');
 
       println(compared, 4);
+    } else if (diag.expected === 'undefined' && diag.actual === 'undefined') {
+      ;
     } else if (typeof diag.expected === 'string') {
       const compared = diffWords(diag.actual, diag.expected)
         .map(writeDiff)
@@ -89,7 +91,7 @@ const createReporter = () => {
     if (result.ok) {
       println(chalk.green(`All of ${result.count} tests passed!`));
     } else {
-      println(chalk.red(`${result.fail} of ${result.count} tests failed.`));
+      println(chalk.red(`${result.fail || 0} of ${result.count} tests failed.`));
       stream.isFailed = true;
     }
 
