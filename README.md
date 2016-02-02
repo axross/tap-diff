@@ -23,15 +23,24 @@ tape ./*.test.js | tap-diff
 Or use with `createStream()`:
 
 ```javascript
-var test = require('tape');
-var tapDiff = require('tapDiff');
+'use strict'
+
+const test = require('tape')
+const tapDiff = require('tap-diff')
 
 test.createStream()
-  .pipe(tapDiff());
+  .pipe(tapDiff())
+  .pipe(process.stdout)
 
-process.argv.slice(2).forEach(function (file) {
-  require(path.resolve(file));
-});
+test('timing test', (t) => {
+  t.plan(2)
+  t.equal(typeof Date.now, 'function')
+  var start = Date.now()
+
+  setTimeout(() => {
+    t.equal(Date.now() - start, 100)
+  }, 100)
+})
 ```
 
 ## License
