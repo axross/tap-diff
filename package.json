@@ -19,7 +19,8 @@
     "figures": "^1.4.0",
     "pretty-ms": "^2.1.0",
     "tap-parser": "^1.2.2",
-    "through2": "^2.0.0"
+    "through2": "^2.0.0",
+    "yargs": "^3.32.0"
   },
   "devDependencies": {
     "babel": "^5.8.34"

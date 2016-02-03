@@ -10,7 +10,7 @@ const INDENT = '  ';
 const FIG_TICK = figures.tick;
 const FIG_CROSS = figures.cross;
 
-const createReporter = () => {
+const createReporter = ({noSuccess} = {}) => {
   const output = through2();
   const p = parser();
   const stream = duplexer(p, output);
@@ -110,7 +110,10 @@ const createReporter = () => {
   });
 
   p.on('assert', (assert) => {
-    if (assert.ok) return handleAssertSuccess(assert);
+    if (assert.ok) {
+      if (!noSuccess) handleAssertSuccess(assert);
+      return;
+    }
 
     handleAssertFailure(assert);
   });
