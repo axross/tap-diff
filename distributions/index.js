@@ -37,6 +37,10 @@ var FIG_TICK = _figures2['default'].tick;
 var FIG_CROSS = _figures2['default'].cross;
 
 var createReporter = function createReporter() {
+  var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  var noSuccess = _ref.noSuccess;
+
   var output = (0, _through22['default'])();
   var p = (0, _tapParser2['default'])();
   var stream = (0, _duplexer2['default'])(p, output);
@@ -72,10 +76,10 @@ var createReporter = function createReporter() {
   var handleAssertFailure = function handleAssertFailure(assert) {
     var name = assert.name;
     var diag = assert.diag;
-    var writeDiff = function writeDiff(_ref) {
-      var value = _ref.value;
-      var added = _ref.added;
-      var removed = _ref.removed;
+    var writeDiff = function writeDiff(_ref2) {
+      var value = _ref2.value;
+      var added = _ref2.added;
+      var removed = _ref2.removed;
 
       var style = _chalk2['default'].white;
 
@@ -131,7 +135,10 @@ var createReporter = function createReporter() {
   });
 
   p.on('assert', function (assert) {
-    if (assert.ok) return handleAssertSuccess(assert);
+    if (assert.ok) {
+      if (!noSuccess) handleAssertSuccess(assert);
+      return;
+    }
 
     handleAssertFailure(assert);
   });

@@ -12,11 +12,11 @@ The most human-friendly [TAP reporter](https://github.com/substack/tape#pretty-r
 
 You can use tap-notify in the same way as other [TAP reporters](https://github.com/substack/tape#pretty-reporters).
 
-```
+```bash
 npm install -g tap-diff
 ```
 
-```
+```bash
 tape ./*.test.js | tap-diff
 ```
 
@@ -32,6 +32,19 @@ test.createStream()
 process.argv.slice(2).forEach(function (file) {
   require(path.resolve(file));
 });
+```
+
+## Options
+
+You can choose to discard success messages using the `--nosuccess` (CLI) or `{noSuccess: true}`:
+
+```bash
+tape ./test.js | tap-diff --nosuccess
+```
+
+```js
+test.createStream({ noSuccess: true })
+  .pipe(tapDiff());
 ```
 
 ## License
