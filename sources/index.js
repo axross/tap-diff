@@ -5,6 +5,7 @@ import figures from 'figures';
 import through2 from 'through2';
 import parser from 'tap-parser';
 import prettyMs from 'pretty-ms';
+import jsondiffpatch from 'jsondiffpatch';
 
 const INDENT = '  ';
 const FIG_TICK = figures.tick;
@@ -40,37 +41,81 @@ const createReporter = () => {
     println(`${chalk.green(FIG_TICK)}  ${chalk.dim(name)}`, 2)
   };
 
+  const toString = (arg) => Object.prototype.toString.call(arg).slice(8, -1).toLowerCase()
+
+  const JSONize = (str) => {
+    return str
+      // wrap keys without quote with valid double quote
+      .replace(/([\$\w]+)\s*:/g, (_, $1) => '"'+$1+'":')
+      // replacing single quote wrapped ones to double quote
+      .replace(/'([^']+)'/g, (_, $1) => '"' + $1 + '"')
+  }
+
   const handleAssertFailure = assert => {
     const name = assert.name;
-    const diag = assert.diag;
+
     const writeDiff = ({ value, added, removed }) => {
       let style = chalk.white;
 
       if (added)   style = chalk.green.inverse;
       if (removed) style = chalk.red.inverse;
 
-      return style(value);
+      // only highlight values and not spaces before
+      return value.replace(/(^\s*)(.*)/g, (m, one, two) => one + style(two))
     };
 
-    println(`${chalk.red(FIG_CROSS)}  ${chalk.red(name)} at ${chalk.magenta(diag.at)}`, 2);
+    let {
+      at,
+      actual,
+      expected
+    } = assert.diag
 
-    if (typeof diag.expected === 'object' && diag.expected !== null) {
-      const compared = diffJson(diag.actual, diag.expected)
+    let expected_type = toString(expected)
+
+    if (expected_type !== 'array' ) {
+      try {
+        // the assert event only returns strings which is broken so this
+        // handles converting strings into objects
+        if (expected.indexOf('{') > -1) {
+          actual = JSON.stringify(JSON.parse(JSONize(actual)), null, 2)
+          expected = JSON.stringify(JSON.parse(JSONize(expected)), null, 2)
+        }
+      } catch (e) {
+        try {
+          actual = JSON.stringify(eval(`(${actual})`), null, 2)
+          expected = JSON.stringify(eval(`(${expected})`), null, 2)
+        } catch (e) {
+          // do nothing because it wasn't a valid json object
+        }
+      }
+
+      expected_type = toString(expected)
+    }
+
+    println(`${chalk.red(FIG_CROSS)}  ${chalk.red(name)} at ${chalk.magenta(at)}`, 2);
+
+    if (expected_type === 'object') {
+      const delta = jsondiffpatch.diff(actual[failed_test_number], expected[failed_test_number])
+      const output = jsondiffpatch.formatters.console.format(delta)
+      println(output, 4)
+
+    } else if (expected_type === 'array') {
+      const compared = diffJson(actual, expected)
         .map(writeDiff)
         .join('');
 
       println(compared, 4);
-    } else if (diag.expected === 'undefined' && diag.actual === 'undefined') {
+    } else if (expected === 'undefined' && actual === 'undefined') {
       ;
-    } else if (typeof diag.expected === 'string') {
-      const compared = diffWords(diag.actual, diag.expected)
+    } else if (expected_type === 'string') {
+      const compared = diffWords(actual, expected)
         .map(writeDiff)
         .join('');
 
       println(compared, 4);
     } else {
       println(
-        chalk.red.inverse(diag.actual) + chalk.green.inverse(diag.expected),
+        chalk.red.inverse(actual) + chalk.green.inverse(expected),
         4
       );
     }
