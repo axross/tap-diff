@@ -17,6 +17,7 @@
     "diff": "^2.2.1",
     "duplexer": "^0.1.1",
     "figures": "^1.4.0",
+    "jsondiffpatch": "^0.1.41",
     "pretty-ms": "^2.1.0",
     "tap-parser": "^1.2.2",
     "through2": "^2.0.0"
