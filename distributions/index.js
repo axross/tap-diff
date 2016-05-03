@@ -36,6 +36,10 @@ var _jsondiffpatch = require('jsondiffpatch');
 
 var _jsondiffpatch2 = _interopRequireDefault(_jsondiffpatch);
 
+var _pdiff = require('pdiff');
+
+var _pdiff2 = _interopRequireDefault(_pdiff);
+
 var INDENT = '  ';
 var FIG_TICK = _figures2['default'].tick;
 var FIG_CROSS = _figures2['default'].cross;
@@ -108,6 +112,74 @@ var createReporter = function createReporter() {
       });
     };
 
+    function decodeNewlines(_x3) {
+      var _again = true;
+
+      _function: while (_again) {
+        var str = _x3;
+        _again = false;
+
+        if (str.match(/([^\\])\\n/g)) {
+          _x3 = str.replace(/([^\\])\\n/g, '$1\n');
+          _again = true;
+          continue _function;
+        }
+        return str;
+      }
+    }
+
+    var diffStrings = function diffStrings(actual, expected) {
+      var padding = '       ';
+      var line = 1;
+      var diff_ = _pdiff2['default'].addLineNumbers(_pdiff2['default'].diff(decodeNewlines(actual), decodeNewlines(expected)));
+      var diff = _pdiff2['default'].extractDiff(diff_, line);
+      var maxLine = diff_.length;
+      var digit = String(maxLine).length;
+      var spaces = '';
+      for (var i = 0; i < digit - 1; i++) {
+        spaces += ' ';
+      }console.log('');
+      diff.forEach(function (group, i) {
+        group.forEach(function (delta) {
+          var text = padding;
+          // Add line numbers
+          if (delta.lineNumberOfLhs != undefined) {
+            text += _chalk2['default'].magenta((spaces + (delta.lineNumberOfLhs + 1)).substr(-digit));
+          } else {
+            text += spaces + _chalk2['default'].magenta('-');
+          }
+          text += ' ';
+          if (delta.lineNumberOfRhs != undefined) {
+            text += _chalk2['default'].magenta((spaces + (delta.lineNumberOfRhs + 1)).substr(-digit));
+          } else {
+            text += spaces + _chalk2['default'].magenta('-');
+          }
+          text += ' ';
+
+          // Add the value of this line
+          delta.values.forEach(function (value) {
+            if (value.added) {
+              text += _chalk2['default'].green.inverse(value.value);
+              return;
+            }
+            if (value.removed) {
+              text += _chalk2['default'].red.inverse(value.value);
+              return;
+            }
+            text += _chalk2['default'].dim(value.value);
+          });
+
+          // Ouput the delta
+          console.log(text);
+        });
+
+        if (i != diff.length - 1) {
+          console.log(padding + _chalk2['default'].dim('...'));
+        }
+      });
+      console.log('');
+    };
+
     var _assert$diag = assert.diag;
     var at = _assert$diag.at;
     var actual = _assert$diag.actual;
@@ -148,9 +220,7 @@ var createReporter = function createReporter() {
     } else if (expected === 'undefined' && actual === 'undefined') {
       ;
     } else if (expected_type === 'string') {
-      var compared = (0, _diff.diffWords)(actual, expected).map(writeDiff).join('');
-
-      println(compared, 4);
+      diffStrings(actual, expected);
     } else {
       println(_chalk2['default'].red.inverse(actual) + _chalk2['default'].green.inverse(expected), 4);
     }

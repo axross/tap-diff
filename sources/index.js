@@ -6,6 +6,7 @@ import through2 from 'through2';
 import parser from 'tap-parser';
 import prettyMs from 'pretty-ms';
 import jsondiffpatch from 'jsondiffpatch';
+import pdiff from 'pdiff';
 
 const INDENT = '  ';
 const FIG_TICK = figures.tick;
@@ -64,6 +65,62 @@ const createReporter = () => {
       return value.replace(/(^\s*)(.*)/g, (m, one, two) => one + style(two))
     };
 
+    function decodeNewlines(str) {
+      if (str.match(/([^\\])\\n/g)) return decodeNewlines(str.replace(/([^\\])\\n/g, '$1\n'));
+      return str;
+    }
+
+    const diffStrings = (actual, expected) => {
+      const padding = '       ';
+      const line = 1;
+      const diff_ = pdiff.addLineNumbers(pdiff.diff(decodeNewlines(actual), decodeNewlines(expected)));
+      const diff = pdiff.extractDiff(diff_, line);
+      const maxLine = diff_.length;
+      const digit = String(maxLine).length;
+      let spaces = '';
+      for (let i = 0; i < digit - 1; i++) spaces += ' ';
+      console.log('');
+      diff.forEach((group, i) => {
+        group.forEach(delta => {
+          let text = padding;
+          // Add line numbers
+          if (delta.lineNumberOfLhs != undefined) {
+            text += chalk.magenta((spaces + (delta.lineNumberOfLhs + 1)).substr(-digit));
+          } else {
+            text += spaces + chalk.magenta('-');
+          }
+          text += ' ';
+          if (delta.lineNumberOfRhs != undefined) {
+            text += chalk.magenta((spaces + (delta.lineNumberOfRhs + 1)).substr(-digit));
+          } else {
+            text += spaces + chalk.magenta('-');
+          }
+          text += ' ';
+
+          // Add the value of this line
+          delta.values.forEach(value => {
+            if (value.added) {
+              text += chalk.green.inverse(value.value);
+              return;
+            }
+            if (value.removed) {
+              text += chalk.red.inverse(value.value);
+              return;
+            }
+            text += chalk.dim(value.value);
+          })
+
+          // Ouput the delta
+          console.log(text);
+        });
+
+        if (i != diff.length - 1) {
+          console.log(padding + chalk.dim('...'));
+        }
+      });
+      console.log('');
+    };
+
     let {
       at,
       actual,
@@ -108,11 +165,7 @@ const createReporter = () => {
     } else if (expected === 'undefined' && actual === 'undefined') {
       ;
     } else if (expected_type === 'string') {
-      const compared = diffWords(actual, expected)
-        .map(writeDiff)
-        .join('');
-
-      println(compared, 4);
+      diffStrings(actual, expected)
     } else {
       println(
         chalk.red.inverse(actual) + chalk.green.inverse(expected),
