@@ -1,6 +1,6 @@
 # tap-emoji-diff
 
-[![npm version](https://badge.fury.io/js/tap-diff.svg)](http://badge.fury.io/js/tap-emoji-diff)
+[![npm version](https://badge.fury.io/js/tap-emoji-diff.svg)](http://badge.fury.io/js/tap-emoji-diff)
 
 My own version 🍺  of diff b/c I am 🙄  special 🚌  and can't work 👍  w/out emoji's
 to keep me focused 👀.
