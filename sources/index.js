@@ -1,4 +1,4 @@
-import { diffWords, diffJson } from 'diff';
+import { diffSentences, diffWordsWithSpace, diffJson } from 'diff';
 import chalk from 'chalk';
 import duplexer from 'duplexer';
 import figures from 'figures';
@@ -7,9 +7,10 @@ import parser from 'tap-parser';
 import prettyMs from 'pretty-ms';
 import jsondiffpatch from 'jsondiffpatch';
 
-const INDENT = '  ';
-const FIG_TICK = figures.tick;
-const FIG_CROSS = figures.cross;
+const INDENT = '  '
+const FIG_TICK = '🍺 '
+const FIG_CROSS = '🔥 '
+const DIFF_LENGTH = 7
 
 const createReporter = () => {
   const output = through2();
@@ -32,13 +33,13 @@ const createReporter = () => {
 
   const handleTest = name => {
     println();
-    println(chalk.blue(name), 1);
+    println(chalk.cyan(name), 1);
   };
 
   const handleAssertSuccess = assert => {
     const name = assert.name;
 
-    println(`${chalk.green(FIG_TICK)}  ${chalk.dim(name)}`, 2)
+    println(`${chalk.green(FIG_TICK)}  ${chalk.green(name)}`, 2)
   };
 
   const toString = (arg) => Object.prototype.toString.call(arg).slice(8, -1).toLowerCase()
@@ -54,13 +55,11 @@ const createReporter = () => {
   const handleAssertFailure = assert => {
     const name = assert.name;
 
+
     const writeDiff = ({ value, added, removed }) => {
-      let style = chalk.white;
-
-      if (added)   style = chalk.green.inverse;
-      if (removed) style = chalk.red.inverse;
-
-      // only highlight values and not spaces before
+      let style = chalk.white
+      if (added)   style = chalk.green.inverse
+      if (removed) style = chalk.red.inverse
       return value.replace(/(^\s*)(.*)/g, (m, one, two) => one + style(two))
     };
 
@@ -108,11 +107,13 @@ const createReporter = () => {
     } else if (expected === 'undefined' && actual === 'undefined') {
       ;
     } else if (expected_type === 'string') {
-      const compared = diffWords(actual, expected)
+      const compared = diffWordsWithSpace(actual, expected)
         .map(writeDiff)
         .join('');
 
+      if (actual.length > DIFF_LENGTH) println(actual, 4);
       println(compared, 4);
+      if (expected.length > DIFF_LENGTH)println(expected, 4);
     } else {
       println(
         chalk.red.inverse(actual) + chalk.green.inverse(expected),
@@ -126,17 +127,17 @@ const createReporter = () => {
 
     println();
     println(
-      chalk.green(`passed: ${result.pass}  `) +
-      chalk.red(`failed: ${result.fail || 0}  `) +
+      chalk.green(`${FIG_TICK} passed: ${result.pass}  `) +
+      chalk.red(`${FIG_CROSS} failed: ${result.fail || 0}  `) +
       chalk.white(`of ${result.count} tests  `) +
       chalk.dim(`(${prettyMs(finishedAt - startedAt)})`)
     );
     println();
 
     if (result.ok) {
-      println(chalk.green(`All of ${result.count} tests passed!`));
+      println(chalk.green(`${FIG_TICK} All of ${result.count} tests passed!`));
     } else {
-      println(chalk.red(`${result.fail || 0} of ${result.count} tests failed.`));
+      println(chalk.red(`${FIG_CROSS} ${result.fail || 0} of ${result.count} tests failed.`));
       stream.isFailed = true;
     }
 
