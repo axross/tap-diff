@@ -1,31 +1,33 @@
 # tap-diff
 
-[![npm version](https://badge.fury.io/js/tap-diff.svg)](http://badge.fury.io/js/tap-diff)
+> The most human-friendly TAP reporter
 
-The most human-friendly [TAP reporter](https://github.com/substack/tape#pretty-reporters).
+<!--@shields('npm')-->
+[![npm version](https://img.shields.io/npm/v/tap-diff.svg)](https://www.npmjs.com/package/tap-diff)
+<!--/@-->
 
 ![Screenshot](screenshot1.png)
 
 ![Screenshot](screenshot2.png)
 
+## Installation
+
+```sh
+npm install --global tap-diff
+```
+
 ## How to use
 
 You can use tap-diff in the same way as other [TAP reporters](https://github.com/substack/tape#pretty-reporters).
 
-```
-npm install -g tap-diff
-```
-
-```
+```sh
 tape ./*.test.js | tap-diff
 ```
 
 tap-diff uses [chalk](https://www.npmjs.com/package/chalk) for adding color, which automatically detects
 color terminals. If you're piping the output and want to force color:
 
-```
-FORCE_COLOR=t tape ./*.test.js | tap-diff
-```
+    FORCE_COLOR=t tape ./*.test.js | tap-diff
 
 Or use with `createStream()`:
 
@@ -52,4 +54,4 @@ test('timing test', (t) => {
 
 ## License
 
-MIT
+[MIT](./LICENSE) © [axross](http://axross.me/)
