@@ -37,8 +37,9 @@ var _jsondiffpatch = require('jsondiffpatch');
 var _jsondiffpatch2 = _interopRequireDefault(_jsondiffpatch);
 
 var INDENT = '  ';
-var FIG_TICK = _figures2['default'].tick;
-var FIG_CROSS = _figures2['default'].cross;
+var FIG_TICK = '🍺 ';
+var FIG_CROSS = '🔥 ';
+var DIFF_LENGTH = 7;
 
 var createReporter = function createReporter() {
   var output = (0, _through22['default'])();
@@ -64,13 +65,13 @@ var createReporter = function createReporter() {
 
   var handleTest = function handleTest(name) {
     println();
-    println(_chalk2['default'].blue(name), 1);
+    println(_chalk2['default'].cyan(name), 1);
   };
 
   var handleAssertSuccess = function handleAssertSuccess(assert) {
     var name = assert.name;
 
-    println(_chalk2['default'].green(FIG_TICK) + '  ' + _chalk2['default'].dim(name), 2);
+    println(_chalk2['default'].green(FIG_TICK) + '  ' + _chalk2['default'].green(name), 2);
   };
 
   var toString = function toString(arg) {
@@ -98,11 +99,8 @@ var createReporter = function createReporter() {
       var removed = _ref.removed;
 
       var style = _chalk2['default'].white;
-
       if (added) style = _chalk2['default'].green.inverse;
       if (removed) style = _chalk2['default'].red.inverse;
-
-      // only highlight values and not spaces before
       return value.replace(/(^\s*)(.*)/g, function (m, one, two) {
         return one + style(two);
       });
@@ -148,9 +146,11 @@ var createReporter = function createReporter() {
     } else if (expected === 'undefined' && actual === 'undefined') {
       ;
     } else if (expected_type === 'string') {
-      var compared = (0, _diff.diffWords)(actual, expected).map(writeDiff).join('');
+      var compared = (0, _diff.diffWordsWithSpace)(actual, expected).map(writeDiff).join('');
 
+      if (actual.length > DIFF_LENGTH) println(actual, 4);
       println(compared, 4);
+      if (expected.length > DIFF_LENGTH) println(expected, 4);
     } else {
       println(_chalk2['default'].red.inverse(actual) + _chalk2['default'].green.inverse(expected), 4);
     }
@@ -160,13 +160,13 @@ var createReporter = function createReporter() {
     var finishedAt = Date.now();
 
     println();
-    println(_chalk2['default'].green('passed: ' + result.pass + '  ') + _chalk2['default'].red('failed: ' + (result.fail || 0) + '  ') + _chalk2['default'].white('of ' + result.count + ' tests  ') + _chalk2['default'].dim('(' + (0, _prettyMs2['default'])(finishedAt - startedAt) + ')'));
+    println(_chalk2['default'].green(FIG_TICK + ' passed: ' + result.pass + '  ') + _chalk2['default'].red(FIG_CROSS + ' failed: ' + (result.fail || 0) + '  ') + _chalk2['default'].white('of ' + result.count + ' tests  ') + _chalk2['default'].dim('(' + (0, _prettyMs2['default'])(finishedAt - startedAt) + ')'));
     println();
 
     if (result.ok) {
-      println(_chalk2['default'].green('All of ' + result.count + ' tests passed!'));
+      println(_chalk2['default'].green(FIG_TICK + ' All of ' + result.count + ' tests passed!'));
     } else {
-      println(_chalk2['default'].red((result.fail || 0) + ' of ' + result.count + ' tests failed.'));
+      println(_chalk2['default'].red(FIG_CROSS + ' ' + (result.fail || 0) + ' of ' + result.count + ' tests failed.'));
       stream.isFailed = true;
     }
 

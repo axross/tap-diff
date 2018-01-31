@@ -1,16 +1,16 @@
 {
-  "name": "tap-diff",
-  "version": "0.1.1",
-  "description": "The most human-friendly TAP reporter",
+  "name": "tap-emoji-diff",
+  "version": "0.0.4",
+  "description": "My own version of a diff TAP reporter",
   "main": "./distributions/index.js",
   "bin": {
-    "tap-diff": "./distributions/cli.js"
+    "tap-emoji-diff": "./distributions/cli.js"
   },
   "scripts": {
     "babel": "babel ./sources --out-dir ./distributions",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "axross <kou@axross.org> (http://axross.me/)",
+  "author": "tpickle <tapickell@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "chalk": "^1.1.1",
@@ -27,12 +27,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/axross/tap-diff.git"
+    "url": "git+https://github.com/tapickell/tap-diff.git"
   },
   "bugs": {
-    "url": "https://github.com/axross/tap-diff/issues"
+    "url": "https://github.com/tapickell/tap-diff/issues"
   },
-  "homepage": "https://github.com/axross/tap-diff#readme",
+  "homepage": "https://github.com/tapickell/tap-diff#readme",
   "keywords": [
     "tap",
     "tape",
