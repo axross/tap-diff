@@ -57,7 +57,7 @@ var createReporter = function createReporter() {
     }
 
     input.split('\n').forEach(function (line) {
-      output.push('' + indent + line);
+      output.push(`${indent}${line}`);
       output.push('\n');
     });
   };
@@ -70,7 +70,7 @@ var createReporter = function createReporter() {
   var handleAssertSuccess = function handleAssertSuccess(assert) {
     var name = assert.name;
 
-    println(_chalk2.default.green(FIG_TICK) + '  ' + _chalk2.default.dim(name), 2);
+    println(`${_chalk2.default.green(FIG_TICK)}  ${_chalk2.default.dim(name)}`, 2);
   };
 
   var toString = function toString(arg) {
@@ -126,8 +126,8 @@ var createReporter = function createReporter() {
         }
       } catch (e) {
         try {
-          actual = JSON.stringify(eval('(' + actual + ')'), null, 2);
-          expected = JSON.stringify(eval('(' + expected + ')'), null, 2);
+          actual = JSON.stringify(eval(`(${actual})`), null, 2);
+          expected = JSON.stringify(eval(`(${expected})`), null, 2);
         } catch (e) {
           // do nothing because it wasn't a valid json object
         }
@@ -136,7 +136,7 @@ var createReporter = function createReporter() {
       expected_type = toString(expected);
     }
 
-    println(_chalk2.default.red(FIG_CROSS) + '  ' + _chalk2.default.red(name) + ' at ' + _chalk2.default.magenta(at), 2);
+    println(`${_chalk2.default.red(FIG_CROSS)}  ${_chalk2.default.red(name)} at ${_chalk2.default.magenta(at)}`, 2);
 
     if (expected_type === 'object') {
       var delta = _jsondiffpatch2.default.diff(actual[failed_test_number], expected[failed_test_number]);
@@ -161,13 +161,13 @@ var createReporter = function createReporter() {
     var finishedAt = Date.now();
 
     println();
-    println(_chalk2.default.green('passed: ' + result.pass + '  ') + _chalk2.default.red('failed: ' + (result.fail || 0) + '  ') + _chalk2.default.white('of ' + result.count + ' tests  ') + _chalk2.default.dim('(' + (0, _prettyMs2.default)(finishedAt - startedAt) + ')'));
+    println(_chalk2.default.green(`passed: ${result.pass}  `) + _chalk2.default.red(`failed: ${result.fail || 0}  `) + _chalk2.default.white(`of ${result.count} tests  `) + _chalk2.default.dim(`(${(0, _prettyMs2.default)(finishedAt - startedAt)})`));
     println();
 
     if (result.ok) {
-      println(_chalk2.default.green('All of ' + result.count + ' tests passed!'));
+      println(_chalk2.default.green(`All of ${result.count} tests passed!`));
     } else {
-      println(_chalk2.default.red((result.fail || 0) + ' of ' + result.count + ' tests failed.'));
+      println(_chalk2.default.red(`${result.fail || 0} of ${result.count} tests failed.`));
       stream.isFailed = true;
     }
 
@@ -198,7 +198,7 @@ var createReporter = function createReporter() {
   });
 
   p.on('extra', function (extra) {
-    println(_chalk2.default.yellow(('' + extra).replace(/\n$/, '')), 4);
+    println(_chalk2.default.yellow(`${extra}`.replace(/\n$/, '')), 4);
   });
 
   return stream;

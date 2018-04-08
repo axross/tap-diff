@@ -26,6 +26,9 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1"
   },
+  "engines": {
+    "node": ">=4"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/axross/tap-diff.git"
