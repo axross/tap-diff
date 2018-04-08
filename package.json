@@ -23,7 +23,8 @@
     "through2": "^2.0.0"
   },
   "devDependencies": {
-    "babel": "^5.8.34"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
   },
   "repository": {
     "type": "git",
