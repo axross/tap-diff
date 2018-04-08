@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import duplexer from 'duplexer';
 import figures from 'figures';
 import through2 from 'through2';
-import parser from 'tap-parser';
+import Parser from 'tap-parser';
 import prettyMs from 'pretty-ms';
 import jsondiffpatch from 'jsondiffpatch';
 
@@ -13,7 +13,7 @@ const FIG_CROSS = figures.cross;
 
 const createReporter = () => {
   const output = through2();
-  const p = parser();
+  const p = new Parser();
   const stream = duplexer(p, output);
   const startedAt = Date.now();
 
