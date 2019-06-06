@@ -77,13 +77,13 @@ const createReporter = () => {
         // the assert event only returns strings which is broken so this
         // handles converting strings into objects
         if (expected.indexOf('{') > -1) {
-          actual = JSON.stringify(JSON.parse(JSONize(actual)), null, 2)
-          expected = JSON.stringify(JSON.parse(JSONize(expected)), null, 2)
+          actual = JSON.parse(JSONize(actual));
+          expected = JSON.parse(JSONize(expected));
         }
       } catch (e) {
         try {
-          actual = JSON.stringify(eval(`(${actual})`), null, 2)
-          expected = JSON.stringify(eval(`(${expected})`), null, 2)
+          actual = JSON.parse(JSON.stringify(eval(`(${actual})`)))
+          expected = JSON.parse(JSON.stringify(eval(`(${expected})`)))
         } catch (e) {
           // do nothing because it wasn't a valid json object
         }
@@ -95,7 +95,8 @@ const createReporter = () => {
     println(`${chalk.red(FIG_CROSS)}  ${chalk.red(name)} at ${chalk.magenta(at)}`, 2);
 
     if (expected_type === 'object') {
-      const delta = jsondiffpatch.diff(actual[failed_test_number], expected[failed_test_number])
+      const delta = jsondiffpatch.diff(actual, expected)
+
       const output = jsondiffpatch.formatters.console.format(delta)
       println(output, 4)
 
