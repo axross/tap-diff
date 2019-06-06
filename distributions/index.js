@@ -120,13 +120,13 @@ var createReporter = function createReporter() {
         // the assert event only returns strings which is broken so this
         // handles converting strings into objects
         if (expected.indexOf('{') > -1) {
-          actual = JSON.stringify(JSON.parse(JSONize(actual)), null, 2);
-          expected = JSON.stringify(JSON.parse(JSONize(expected)), null, 2);
+          actual = JSON.parse(JSONize(actual));
+          expected = JSON.parse(JSONize(expected));
         }
       } catch (e) {
         try {
-          actual = JSON.stringify(eval('(' + actual + ')'), null, 2);
-          expected = JSON.stringify(eval('(' + expected + ')'), null, 2);
+          actual = JSON.parse(JSON.stringify(eval('(' + actual + ')')));
+          expected = JSON.parse(JSON.stringify(eval('(' + expected + ')')));
         } catch (e) {
           // do nothing because it wasn't a valid json object
         }
@@ -138,7 +138,8 @@ var createReporter = function createReporter() {
     println(_chalk2['default'].red(FIG_CROSS) + '  ' + _chalk2['default'].red(name) + ' at ' + _chalk2['default'].magenta(at), 2);
 
     if (expected_type === 'object') {
-      var delta = _jsondiffpatch2['default'].diff(actual[failed_test_number], expected[failed_test_number]);
+      var delta = _jsondiffpatch2['default'].diff(actual, expected);
+
       var _output = _jsondiffpatch2['default'].formatters.console.format(delta);
       println(_output, 4);
     } else if (expected_type === 'array') {
