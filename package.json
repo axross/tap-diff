@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^1.1.1",
-    "diff": "^2.2.1",
+    "diff": "^4.0.1",
     "duplexer": "^0.1.1",
     "figures": "^1.4.0",
     "jsondiffpatch": "^0.1.41",
