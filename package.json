@@ -1,6 +1,6 @@
 {
   "name": "tap-diff",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The most human-friendly TAP reporter",
   "main": "./distributions/index.js",
   "bin": {
@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^1.1.1",
-    "diff": "^2.2.1",
+    "diff": "^5.0.0",
     "duplexer": "^0.1.1",
     "figures": "^1.4.0",
     "jsondiffpatch": "^0.1.41",
@@ -23,7 +23,7 @@
     "through2": "^2.0.0"
   },
   "devDependencies": {
-    "babel": "^5.8.34"
+    "babel": "^6.23.0"
   },
   "repository": {
     "type": "git",
